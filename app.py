@@ -20,13 +20,15 @@ def home():
             file.save(input_path)
 
             operation = request.form.get('operation', 'text')
-            output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{os.path.splitext(file.filename)[0]}.{operation if operation == 'text' else 'png'}")
-
-            os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
+            base_name = os.path.splitext(file.filename)[0]
             if operation == 'text':
+                output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}.txt")
                 subprocess.run(['pdftotext.exe', '-layout', input_path, output_path], check=True)
             elif operation == 'image':
-                subprocess.run(['gswin64c.exe', '-sDEVICE=png16m', '-r300', '-o', output_path, input_path], check=True)
+                output_pattern = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}-%d.png")
+                subprocess.run(['gswin64c.exe', '-sDEVICE=png16m', '-r300', '-o', output_pattern, input_path], check=True)
+                # Send the first page as a sample (we'll improve this later)
+                output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}-1.png")
 
             return send_file(output_path, as_attachment=True)
 
