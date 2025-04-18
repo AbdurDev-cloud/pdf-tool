@@ -1,0 +1,262 @@
+                                        FTW: Address
+This purpose of this task is to make sure that the address and location shown for a business on
+Bing will allow users to successfully reach the business.
+
+Procedure
+Business Details and Search Tool
+You will see the business details that are being evaluated on the left side of the screen when
+you load a hit.
+
+
+
+
+Your task is to first check whether the provided entity with the original address represents a
+valid, open entity.
+
+
+
+
+You can use this search tool in the hitapp to find web resources to aid your judgment. This tool
+allows you to select the Name and Address attributes and perform a search on Google or Bing
+to find an official website or social site from the business. In this example, a website is provided
+in the current business details, and you can use the “site” checkbox to perform a search
+exclusively on this domain. This can be helpful for complex websites with multiple sections, but
+you can also just click the URL to explore the page and find the information yourself. You will
+usually be able to find the address on the footer of the home page, or in the following sections:
+contact us, about us, or the store locator. If a functional website is not provided, you will have
+to find a web resource to use, but there are restrictions:
+
+Resources
+ Bad Resources (DO NOT USE)                           Good Resources
+     •   Business listings on Google or Bing              •   Official website (“business name”.com)
+     •   Unofficial aggregator pages (manta.com,          •   Official free hosting site with activity
+         localbest.com, etc.)                                 from the business in the past 365 days
+     •   Unofficial or outdated Facebook pages                (“business name”.weebly.com)
+         (posts are only user comments, or over           •   Official Facebook page with recent
+         365 days old from the business)                      posts from the business (365 days)
+The website must show a name and address that match the provided business details. The
+general principle is that so long as the addresses refer to the same location, they are a match,
+though you may encounter some peculiar situations in the many different countries you can
+encounter here.
+
+If you’ve found no evidence that the provided entity details match an entity that is currently
+open, you should mark all address components and the location as Unable To Verify. But if you
+do have a good resource for the entity, you will select all the values that match the provided
+entity and submit the hit. Though please make sure to check for any possible improvements
+that are possible for the existing address.
+
+Address Improvements
+ Existing Option          Improved Form
+ 1836 Westlake Ave N,     1836 Westlake Ave N Ste If a business address has a suite number,
+ Seattle, WA 98109        302, Seattle, WA 98109  it should be included.
+
+ 1836 Westlake Ave        1836 Westlake Ave N Ste If a business address features a cardinal
+ Ste 302, Seattle, WA     302, Seattle, WA 98109  direction, this is also something we want
+ 98109                                            to see included in the address.
+
+ 1836 Westlake Ave        1836 Westlake Ave N Ste      If an existing business address had the
+ Ste 302, Seattle, WA     302, Seattle, WA 98109       wrong postal code, we want to ensure
+ 98108                                                 that it gets corrected.
+
+
+If any of these improvements are possible, you should select Values above are missing or
+wrong and make the improvements to the address. If you are not able to find evidence that the
+original business is open, you should investigate whether any of the alternate values that are
+available represent an open business.
+
+ Example:                                         In the screenshot to the left, the 1409 Willow
+                                                  St Ste 400 address is what we currently have
+                                                  listed in the current business details. After
+                                                  you determine that there is no evidence that
+                                                  the business is open at 1409 Willow St, you
+                                                  would need to check to see if the business is
+                                                  open at 2751 Hennepin Ave S Ste 712.
+                                                   There is web evidence that the business
+                                                   exists at this location from the website listed
+                                                   under the current business details,
+                                                   https://tomglaserlp.com/. In some cases, you
+                                                   may have to search for a new website using
+                                                   the business details.
+
+                                                   Since we can see that the second address
+                                                   option is correct, it should be selected. If this
+                                                   option were missing the suite number (#712),
+                                                   you would need to select Values above are
+                                                   missing or wrong and manually enter in the
+                                                   address with this information.
+
+You will also provide separate judgments for the city, state/province, and postal code. If you
+can find no evidence to support any of the suggested values as the new address, you can
+attempt to see if the correct location is available from the good web resources.
+
+Additional Tips
+   • Chain entities: Businesses like Starbucks have thousands of locations spread across a
+       single country. If you have a chain entity such as this, and the current business details
+       show an address that does not match an existing location, then there could be dozens of
+       valid choices that you could make for the new address. Our interest is in cleaning up the
+       existing business details, and so we would not update to a different chain location, as
+       that is an entirely different entity. The problem with this business is not the address, it's
+       that it even exists in the first place. This problem will be handled in a different hitapp. If
+       the suggestion doesn't make any improvement to the existing business details because
+       they refer to a business that does not appear to exist, please mark this as Unable to
+       verify.
+   • Service area businesses: There are some businesses that provide a service and their
+       websites only indicate a city or region where the service is provided. These businesses
+       will sometimes be listed with the home address of the person running the business, but
+       they typically do not want customers to show up at their home. Please select I verified
+       value should be empty for these businesses when they do not provide an address. But if
+       they do provide an address on the website or official social profile, you should use it.
+   • Departments: Make sure to pay attention to any department indicated in the name,
+       particularly for universities and hospitals, since these departments typically have their
+       own unique suite number.
+
+Map Location
+After you have judged the correct address, you will have to make sure it is correctly placed on
+the map. If you could not find good web evidence for the business and selected Unable to
+Verify for the address components, select Unable To Verify for the location as well.
+Otherwise, the following section will let you know what you need to do to identify and select
+the correct location.
+Using the Tools
+Click on ‘Markers’ (1, 2, or Judge Marker) to center the map over that marker. Press the + (or
+ctrl + scroll up) to zoom in. Press button ‘Zoom to fit’ at the lower left to show all markers.
+Manually input a lat/long in the ‘Location’ field to reposition the Judge Marker, or use the
+mouse to move the Judge Marker which then updates the ‘Location’ field. Click the radio
+buttons under ‘Selection’ to choose one of those options. Change views from Aerial to Road,
+Bird’s eye, or Streetside, or drop into Streetside directly by clicking the light blue track (seen on
+W Grand Ave below). Expand or collapse the map beneath Streetside using the up/down
+button. Exit Streetside by pressing the x at upper right. Use the Bing.com or Google.com links,
+or press the Bing Maps logo in the lower left to open the map at the current location.
+
+
+
+
+Pin Placement
+To choose a valid pin or set a good pin, you need to know 1) what makes a good pin and 2) how
+to verify it.
+
+Valid Pin Placement
+A valid pin will nearly always be over a building and at the provided address. If you can find a
+CWS that confirms the given name and address, you can look for the business name at the
+location. You may also see the business in old street images. If you could not find good web
+evidence for the business and selected Unable to Verify for the address components, select
+Unable To Verify for the location as well.
+                     A pin                                            This pin is valid for Franklin
+                     right on                                         Falls, which is a natural
+                     the edge                                         feature and therefore will
+                     of the                                           not be inside a building.
+                     valid area                                       Here, user uploaded
+                     is valid.                                        images are especially
+                                                                      helpful to pinpoint the
+                                                                      location, but you may also
+                                                                      try the CWS, Wikipedia,
+                                   regular street images, aerial imagery, or in the USA the GNIS.
+
+Extent of Business or Address Area
+The business storefront or address extent will determine the valid pin area. This is best
+explained through examples.
+
+ The Pantry On Tap Oil and Vinegar
+ 7634 S Westnedge Ave, Portage, MI, 49024
+ (269) 978-6641
+ https://www.thepantryontap.com/
+
+ Street images show that each storefront
+ has a distinct address. Thus the valid pin
+ must be on the building area roughly
+ defined by the storefront. Pin #1 is right
+ on the border so it is valid. Pin #2 is not
+ valid because it is on the parking lot.
+KYong Skin Care
+7795 W Sahara Ave, Las Vegas, NV, 89117
+(702) 900-3228
+http://www.kyongskincare.com/
+
+The given website does not have this
+location any longer. Navigate to the
+address and find all storefronts in this
+center address to 7795 per street images.
+It is not possible to find evidence of the
+storefront ‘KYong Skin Care’ in old street
+images, so any pin over the building is
+valid. Choose Pin #1.
+Auto Expo
+7912 Ardmore Rd, Norfolk, VA, 23518
+(757) 828-7131
+http://www.autoexpova.com/
+
+The given website no longer has this
+address, so shift to street images, which in
+Apr 2019 shows the business sign and the
+building number 7912 painted on the
+doorway. By this, you can approve Pin #1.
+ Baldwin Park Animal Care Center
+ 4275 Elton St, Baldwin Park, CA, 91706
+ (626) 962-3577
+ https://animalcare.lacounty.gov/
+
+ Currently the given business exists at the
+ given address. The CWS has a map of the
+ buildings, all of which pertain to 4275
+ Elton St. Therefore a pin on any of the
+ buildings would be considered valid. You
+ can approve Pin #1.
+
+
+
+
+ Goodwill
+ Putnam Village Shopping Center,
+ Hurricane, WV, 25526
+ (304) 757-4365
+ http://www.goodwillkv.com/
+
+               While the entire building
+               pertains to the Putnam
+               Village Shopping Center, you
+               can see the precise location
+               of Goodwill in street images,
+               so it’s possible to move the
+ Judge Marker to the center of the valid
+ area (the crossing point of the dashed
+ yellow lines in the image at left). It is not
+ necessary to place the pin nearer the main
+ entrance.
+
+Bad Pin Placement
+Do not place or approve a pin that is in the street, on a highway, on a sidewalk, in a parking lot
+or area, not clearly on a building, or on the grounds of a building.
+Good for Verifying Pin
+Company Website (CWS)
+Try to find a CWS (Company Website) with matching name and address; the website may clarify
+their location under menu headings like Contact Us, Location, Directions, etc. Larger entities
+like airports and universities may have maps.
+
+Street Images
+You can find street images using 1) Embedded Streetside Tool From Bing Maps, 2) External Bing
+Maps Streetside ↗, 3) External Google Maps Street View ↗, and 4) Panorama/全景 at Baidu
+Maps/百度地图 https://map.baidu.com/ ↗.
+
+Other Good Resources to Verify Pin. Zillow (USA). Also if street blocks are numbered by a
+regular pattern, you can consider proof that the given building number would fall on a certain
+block.
+
+Bad for Verifying Pin
+Do not take the lat/long pin coordinates directly from map engines!
+
+Pin Selection Reminders
+Where pin 1 and 2 are confirmed as equally valid, choose pin 1.
+Where pin 1 is probably valid but you can’t get solid confirmation (and pin 2 is either wrong,
+missing, or not better than pin 1), choose Unable to Verify.
+Where pin 2 is probably valid but you can’t get solid confirmation (and pin 1 is either wrong or
+not better than pin 2), choose pin 2 (here, our aim is incremental improvement of the pin).
+If you have a pin over any portion of the correct area (including right on the edge), it’s valid and
+can be chosen. If there are no pins over the correct area, place the pin over the center of the
+correct area.
+
+Zoom in to the fullest extent when setting the Judge Marker.
+
+The business storefront or address extent will determine the valid pin area. If the business can
+be linked to the location, consider the name and the address to set the pin. If you could not
+find good web evidence for the business and selected Unable to Verify for the address
+components, select Unable To Verify for the location as well.
+
