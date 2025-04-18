@@ -18,10 +18,15 @@ def home():
             os.makedirs('uploads', exist_ok=True)
             file.save(input_path)
 
-            # Example: Convert PDF to text using Poppler
+            # Convert PDF to text using pdftotext.exe from Poppler
             output_path = os.path.join('outputs', f"{os.path.splitext(file.filename)[0]}.txt")
             os.makedirs('outputs', exist_ok=True)
-            subprocess.run(['pdf2txt.py', '-o', output_path, input_path], check=True)
+            subprocess.run([
+                'pdftotext.exe',
+                '-layout',
+                input_path,
+                output_path
+            ], check=True)
 
             return send_file(output_path, as_attachment=True)
 
