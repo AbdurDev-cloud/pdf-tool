@@ -33,8 +33,10 @@ def home():
                     '-sDEVICE=png16m',
                     '-r300',
                     '-sOutputFile=' + output_pattern,
+                    '-dBATCH',  # Run in batch mode
+                    '-dNOPAUSE',  # Prevent pausing between pages
                     input_path
-                ], check=True)
+                ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                 # Create a zip file of all generated images
                 zip_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_images.zip")
