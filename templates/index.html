@@ -5,44 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Tool</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- For icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f4f6f9;
+            background-color: #f0f2f5;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Helvetica', sans-serif;
         }
-        .header {
-            background-color: #007bff;
-            color: white;
-            padding: 15px 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .nav-link:hover {
+            color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
         }
         .content {
-            flex: 1;
+            margin-left: 250px;
             padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex: 1;
         }
         .pdf-container {
             background: white;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 700px;
         }
         .drag-area {
             border: 2px dashed #007bff;
-            padding: 20px;
+            padding: 40px;
             margin-bottom: 20px;
-            border-radius: 10px;
+            border-radius: 5px;
             background: #f8f9fa;
+            text-align: center;
             cursor: pointer;
         }
         .drag-area.dragover {
@@ -67,33 +78,59 @@
             color: white;
             padding: 10px 0;
             text-align: center;
-            margin-top: auto;
+            width: 100%;
+            margin-left: 250px;
+        }
+        .alert {
+            margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>PDF Tool</h1>
+    <div class="sidebar">
+        <h4 class="text-center mb-4" style="color: #007bff;">PDF Tools</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" data-operation="text"><i class="fas fa-file-alt"></i> Convert to Text</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-operation="image"><i class="fas fa-image"></i> Convert to Images</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-operation="merge"><i class="fas fa-copy"></i> Merge PDFs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-operation="split"><i class="fas fa-cut"></i> Split</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-operation="compress"><i class="fas fa-compress"></i> Compress</a>
+            </li>
+        </ul>
     </div>
     <div class="content">
         <div class="pdf-container">
-            <h2>Process Your PDF</h2>
+            <h2 class="mb-4">Process Your PDF</h2>
             <div class="drag-area" id="dragArea">
-                <p>Drag & Drop your PDF here or <span class="text-primary">Browse Files</span></p>
+                <p><i class="fas fa-cloud-upload-alt"></i> Drag & Drop your PDF here or <span class="text-primary">Browse Files</span></p>
                 <input type="file" name="file" id="fileInput" multiple class="d-none">
-                <p id="fileNames"></p>
+                <p id="fileNames" class="text-muted"></p>
             </div>
             <div class="mb-3">
                 <select class="form-select" name="operation" id="operation">
                     <option value="text">Convert to Text</option>
                     <option value="image">Convert to Images</option>
                     <option value="merge">Merge PDFs</option>
+                    <option value="split">Split</option>
+                    <option value="compress">Compress</option>
                 </select>
             </div>
             <button type="button" class="btn btn-primary" id="processBtn">Process</button>
             <div class="progress">
                 <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
             </div>
+            <div class="alert alert-success" role="alert" id="successMsg"></div>
+            <div class="alert alert-danger" role="alert" id="errorMsg"></div>
         </div>
     </div>
     <div class="footer">
@@ -108,6 +145,10 @@
         const processBtn = document.getElementById('processBtn');
         const progress = document.querySelector('.progress');
         const progressBar = document.querySelector('.progress-bar');
+        const operationSelect = document.getElementById('operation');
+        const successMsg = document.getElementById('successMsg');
+        const errorMsg = document.getElementById('errorMsg');
+        const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
 
         // Drag and Drop
         dragArea.addEventListener('dragover', (e) => {
@@ -127,16 +168,31 @@
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
         function handleFiles(files) {
-            fileNames.innerHTML = Array.from(files).map(f => f.name).join(', ');
-            fileInput.files = files;
+            if (files.length > 0) {
+                fileNames.innerHTML = Array.from(files).map(f => f.name).join(', ');
+                fileInput.files = files;
+            } else {
+                fileNames.innerHTML = '';
+            }
         }
+
+        // Sidebar Selection
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const operation = link.getAttribute('data-operation');
+                if (operation) {
+                    operationSelect.value = operation;
+                }
+            });
+        });
 
         // Process Button
         processBtn.addEventListener('click', () => {
             if (fileInput.files.length > 0) {
                 const formData = new FormData();
                 Array.from(fileInput.files).forEach(file => formData.append('file', file));
-                formData.append('operation', document.getElementById('operation').value);
+                formData.append('operation', operationSelect.value);
 
                 progress.style.display = 'block';
                 let progressValue = 0;
@@ -151,19 +207,38 @@
                 fetch('/', {
                     method: 'POST',
                     body: formData
-                }).then(response => response.blob())
-                  .then(blob => {
-                      const url = window.URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'output.zip'; // Adjust based on operation
-                      a.click();
-                      window.URL.revokeObjectURL(url);
-                      progress.style.display = 'none';
-                      progressBar.style.width = '0%';
-                      progressBar.setAttribute('aria-valuenow', '0');
-                      progressBar.textContent = '0%';
-                  }).catch(error => console.error('Error:', error));
+                }).then(response => {
+                    if (!response.ok) throw new Error('Processing failed');
+                    return response.blob();
+                }).then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = operationSelect.value === 'image' ? 'output_images.zip' : 
+                               operationSelect.value === 'split' ? 'output_split.zip' : 
+                               `output.${operationSelect.value === 'text' ? 'txt' : 'pdf'}`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    successMsg.style.display = 'block';
+                    successMsg.textContent = 'Processing completed successfully!';
+                    setTimeout(() => successMsg.style.display = 'none', 3000);
+                    progress.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    progressBar.setAttribute('aria-valuenow', '0');
+                    progressBar.textContent = '0%';
+                }).catch(error => {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Error: ' + error.message;
+                    setTimeout(() => errorMsg.style.display = 'none', 3000);
+                    progress.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    progressBar.setAttribute('aria-valuenow', '0');
+                    progressBar.textContent = '0%';
+                });
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Please select at least one file.';
+                setTimeout(() => errorMsg.style.display = 'none', 3000);
             }
         });
     </script>

@@ -48,6 +48,38 @@ def home():
             input_files = [os.path.join(app.config['UPLOAD_FOLDER'], f.filename) for f in files if f.filename]
             subprocess.run(['gswin64c.exe', '-dBATCH', '-dNOPAUSE', '-sDEVICE=pdfwrite', '-sOutputFile=' + output_path] + input_files, check=True)
             return send_file(output_path, as_attachment=True, download_name=f"{base_name}.pdf")
+        elif operation == 'split':
+            output_pattern = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_page%d.pdf")
+            subprocess.run([
+                'gswin64c.exe',
+                '-sDEVICE=pdfwrite',
+                '-dBATCH',
+                '-dNOPAUSE',
+                '-sOutputFile=' + output_pattern,
+                input_path
+            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            zip_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_split.zip")
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                # Dynamically determine page count (simplified)
+                for i in range(1, 10):  # Adjust range if needed
+                    page_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_page{i}.pdf")
+                    if os.path.exists(page_path):
+                        zipf.write(page_path, os.path.basename(page_path))
+            return send_file(zip_path, as_attachment=True, download_name=f"{base_name}_split.zip")
+        elif operation == 'compress':
+            output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_compressed.pdf")
+            subprocess.run([
+                'gswin64c.exe',
+                '-sDEVICE=pdfwrite',
+                '-dCompatibilityLevel=1.4',
+                '-dPDFSETTINGS=/screen',
+                '-dColorImageDownsampleType=/Bicubic',
+                '-dColorImageResolution=72',
+                '-dDownsampleColorImages=true',
+                '-sOutputFile=' + output_path,
+                input_path
+            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            return send_file(output_path, as_attachment=True, download_name=f"{base_name}_compressed.pdf")
 
     return render_template('index.html')
 
