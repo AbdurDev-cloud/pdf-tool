@@ -159,11 +159,11 @@
             </div>
             <div class="mb-3">
                 <select class="form-select" name="operation" id="operation">
-                    <option value="text">Convert to Text</option>
-                    <option value="image">Convert to Images</option>
-                    <option value="merge">Merge PDFs</option>
-                    <option value="split">Split</option>
-                    <option value="compress">Compress</option>
+                    <option value="text" {% if operation == 'text' %}selected{% endif %}>Convert to Text</option>
+                    <option value="image" {% if operation == 'image' %}selected{% endif %}>Convert to Images</option>
+                    <option value="merge" {% if operation == 'merge' %}selected{% endif %}>Merge PDFs</option>
+                    <option value="split" {% if operation == 'split' %}selected{% endif %}>Split</option>
+                    <option value="compress" {% if operation == 'compress' %}selected{% endif %}>Compress</option>
                 </select>
             </div>
             <button type="button" class="btn btn-primary" id="processBtn">Process</button>
@@ -231,16 +231,16 @@
             }
         }
 
-        // Sidebar Navigation
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const operation = link.getAttribute('data-operation');
-                if (operation) {
-                    window.location.href = `/${operation}`;
-                }
-                sidebar.classList.remove('active');
-            });
+        // Disable other options in the dropdown based on the current page
+        window.addEventListener('load', () => {
+            const currentOperation = '{{ operation }}';
+            if (currentOperation) {
+                Array.from(operationSelect.options).forEach(option => {
+                    if (option.value !== currentOperation) {
+                        option.disabled = true;
+                    }
+                });
+            }
         });
 
         // Process Button
