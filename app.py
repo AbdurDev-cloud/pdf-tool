@@ -1,6 +1,7 @@
 from flask import Flask, request, send_file, render_template
 import subprocess
 import os
+import zipfile
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -24,13 +25,26 @@ def home():
             if operation == 'text':
                 output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}.txt")
                 subprocess.run(['pdftotext.exe', '-layout', input_path, output_path], check=True)
+                return send_file(output_path, as_attachment=True)
             elif operation == 'image':
                 output_pattern = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}-%d.png")
-                subprocess.run(['gswin64c.exe', '-sDEVICE=png16m', '-r300', '-o', output_pattern, input_path], check=True)
-                # Send the first page as a sample (we'll improve this later)
-                output_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}-1.png")
+                subprocess.run([
+                    'gswin64c.exe',
+                    '-sDEVICE=png16m',
+                    '-r300',
+                    '-sOutputFile=' + output_pattern,
+                    input_path
+                ], check=True)
 
-            return send_file(output_path, as_attachment=True)
+                # Create a zip file of all generated images
+                zip_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_images.zip")
+                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for i in range(1, 10):  # Adjust range based on max pages if known
+                        page_path = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}-{i}.png")
+                        if os.path.exists(page_path):
+                            zipf.write(page_path, os.path.basename(page_path))
+
+                return send_file(zip_path, as_attachment=True)
 
     return render_template('index.html')
 
