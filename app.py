@@ -4,6 +4,7 @@ from zipfile import ZipFile
 import os
 from PIL import Image
 import PyPDF2
+from pdf2image import convert_from_bytes
 
 app = Flask(__name__)
 
@@ -47,68 +48,82 @@ def process():
         return "No selected file", 400
 
     output = None
-    if operation == 'text':
-        pdf_reader = PyPDF2.PdfReader(files[0])
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text() or ""
-        output = text.encode()
-    elif operation == 'image':
-        pdf_reader = PyPDF2.PdfReader(files[0])
-        images = []
-        for page_num in range(len(pdf_reader.pages)):
-            page = pdf_reader.pages[page_num]
-            if '/XObject' in page['/Resources']:
-                xObject = page['/Resources']['/XObject'].get_object()
-                for obj in xObject:
-                    if xObject[obj]['/Subtype'] == '/Image':
-                        size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
-                        data = xObject[obj].get_data()
-                        if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
-                            mode = "RGB"
-                        else:
-                            mode = "P"
-                        img = Image.frombytes(mode, size, data)
-                        images.append(img)
-        buffer = BytesIO()
-        with ZipFile(buffer, 'w') as zipf:
-            for i, img in enumerate(images):
-                img_byte_arr = BytesIO()
-                img.save(img_byte_arr, format='PNG')
-                zipf.writestr(f'image_{i}.png', img_byte_arr.getvalue())
-        output = buffer.getvalue()
-    elif operation == 'merge':
-        pdf_writer = PyPDF2.PdfWriter()
-        for file in files:
-            pdf_reader = PyPDF2.PdfReader(file)
+    try:
+        if operation == 'text':
+            pdf_reader = PyPDF2.PdfReader(files[0])
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() or ""
+            output = text.encode()
+        elif operation == 'image':
+            pdf_file = files[0].read()  # Read the PDF file
+            pdf_reader = PyPDF2.PdfReader(BytesIO(pdf_file))
+            images = []
+            # Try direct image extraction with PyPDF2
+            for page_num in range(len(pdf_reader.pages)):
+                page = pdf_reader.pages[page_num]
+                if '/XObject' in page['/Resources']:
+                    xObject = page['/Resources']['/XObject'].get_object()
+                    for obj in xObject:
+                        if xObject[obj]['/Subtype'] == '/Image':
+                            size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
+                            data = xObject[obj].get_data()
+                            if data and len(data) > 0:
+                                try:
+                                    if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                                        mode = "RGB"
+                                    else:
+                                        mode = "P"
+                                    img = Image.frombytes(mode, size, data)
+                                    images.append(img)
+                                except ValueError:
+                                    continue  # Skip invalid image data
+            # If no images extracted, use pdf2image as fallback
+            if not images:
+                images = convert_from_bytes(pdf_file, dpi=200)  # Render all pages as images
+            if not images:
+                return "No extractable or renderable images found in the PDF", 400
+            buffer = BytesIO()
+            with ZipFile(buffer, 'w') as zipf:
+                for i, img in enumerate(images):
+                    img_byte_arr = BytesIO()
+                    img.save(img_byte_arr, format='PNG')
+                    zipf.writestr(f'image_{i}.png', img_byte_arr.getvalue())
+            output = buffer.getvalue()
+        elif operation == 'merge':
+            pdf_writer = PyPDF2.PdfWriter()
+            for file in files:
+                pdf_reader = PyPDF2.PdfReader(file)
+                for page in pdf_reader.pages:
+                    pdf_writer.add_page(page)
+            buffer = BytesIO()
+            pdf_writer.write(buffer)
+            output = buffer.getvalue()
+        elif operation == 'split':
+            pdf_reader = PyPDF2.PdfReader(files[0])
+            buffer = BytesIO()
+            with ZipFile(buffer, 'w') as zipf:
+                for page_num in range(len(pdf_reader.pages)):
+                    pdf_writer = PyPDF2.PdfWriter()
+                    pdf_writer.add_page(pdf_reader.pages[page_num])
+                    pdf_output = BytesIO()
+                    pdf_writer.write(pdf_output)
+                    zipf.writestr(f'page_{page_num + 1}.pdf', pdf_output.getvalue())
+            output = buffer.getvalue()
+        elif operation == 'compress':
+            pdf_reader = PyPDF2.PdfReader(files[0])
+            pdf_writer = PyPDF2.PdfWriter()
             for page in pdf_reader.pages:
                 pdf_writer.add_page(page)
-        buffer = BytesIO()
-        pdf_writer.write(buffer)
-        output = buffer.getvalue()
-    elif operation == 'split':
-        pdf_reader = PyPDF2.PdfReader(files[0])
-        buffer = BytesIO()
-        with ZipFile(buffer, 'w') as zipf:
-            for page_num in range(len(pdf_reader.pages)):
-                pdf_writer = PyPDF2.PdfWriter()
-                pdf_writer.add_page(pdf_reader.pages[page_num])
-                pdf_output = BytesIO()
-                pdf_writer.write(pdf_output)
-                zipf.writestr(f'page_{page_num + 1}.pdf', pdf_output.getvalue())
-        output = buffer.getvalue()
-    elif operation == 'compress':
-        pdf_reader = PyPDF2.PdfReader(files[0])
-        pdf_writer = PyPDF2.PdfWriter()
-        for page in pdf_reader.pages:
-            pdf_writer.add_page(page)
-        buffer = BytesIO()
-        pdf_writer.write(buffer)
-        output = buffer.getvalue()  # Note: PyPDF2 doesn't optimize compression; consider PyMuPDF for better results
+            buffer = BytesIO()
+            pdf_writer.write(buffer)
+            output = buffer.getvalue()
+    except Exception as e:
+        return str(e), 500
 
     if output:
         return output, 200, {'Content-Type': 'application/octet-stream', 'Content-Disposition': f'attachment; filename=output.{operation == "text" and "txt" or "zip"}'}
-    return "Operation not supported", 400
+    return "Operation not supported or failed", 400
 
 if __name__ == '__main__':
     app.run(debug=True)
